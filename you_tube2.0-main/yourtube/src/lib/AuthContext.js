@@ -1,4 +1,8 @@
-import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
 import { useState, createContext, useEffect, useContext } from "react";
 import { provider, auth } from "./firebase";
 import axiosInstance from "./axiosinstance";
@@ -6,9 +10,16 @@ import axiosInstance from "./axiosinstance";
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  // ✅ HYDRATE USER FROM localStorage (prevents flicker)
+  const [user, setUser] = useState(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    }
+    return null;
+  });
 
-  // ✅ NEW: loading state
+  // ✅ LOADING STATE (very important)
   const [loading, setLoading] = useState(true);
 
   const login = (userdata) => {
@@ -60,9 +71,13 @@ export const UserProvider = ({ children }) => {
           console.error(error);
           logout();
         }
+      } else {
+        // ✅ HANDLE LOGOUT / NO USER CASE
+        setUser(null);
+        localStorage.removeItem("user");
       }
 
-      // ✅ VERY IMPORTANT: auth check complete
+      // ✅ AUTH CHECK COMPLETE
       setLoading(false);
     });
 
@@ -71,7 +86,13 @@ export const UserProvider = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, login, logout, handlegooglesignin, loading }}
+      value={{
+        user,
+        login,
+        logout,
+        handlegooglesignin,
+        loading,
+      }}
     >
       {children}
     </UserContext.Provider>
