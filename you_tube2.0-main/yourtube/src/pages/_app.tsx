@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import dynamic from "next/dynamic";
 import Sidebar from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
@@ -6,6 +6,11 @@ import type { AppProps } from "next/app";
 import { UserProvider } from "../lib/AuthContext";
 import Head from "next/head";
 import { createContext, useState, useContext } from "react";
+
+// ✅ DISABLE SSR FOR HEADER (FINAL FLICKER FIX)
+const Header = dynamic(() => import("@/components/Header"), {
+  ssr: false,
+});
 
 // GLOBAL LAYOUT CONTEXT (Collapse persistence)
 const LayoutContext = createContext<any>(null);
@@ -23,16 +28,13 @@ export default function App({ Component, pageProps }: AppProps) {
             <title>Your-Tube Clone</title>
           </Head>
 
-          {/* Header now uses global collapse */}
+          {/* ✅ Header is now client-only */}
           <Header />
-          
 
           <Toaster />
 
           <div className="flex">
-            {/* Sidebar now reads global collapse */}
             <Sidebar />
-
             <Component {...pageProps} />
           </div>
         </div>
