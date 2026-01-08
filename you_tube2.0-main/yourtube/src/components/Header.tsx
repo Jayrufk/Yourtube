@@ -19,7 +19,12 @@ import Image from "next/image";
 
 const Header = () => {
   const { collapsed, setCollapsed } = useLayout();
-  const { user, logout, handlegooglesignin } = useUser();
+
+  // ✅ ONLY NECESSARY CHANGE: loading added
+  const { user, logout, handlegooglesignin, loading } = useUser();
+
+  // ✅ STOP RENDER UNTIL AUTH IS READY
+  if (loading) return null;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isdialogeopen, setisdialogeopen] = useState(false);
@@ -41,7 +46,6 @@ const Header = () => {
 
   return (
     <header className="h-16 flex items-center justify-between px-4 bg-white border-b sticky top-0 z-40">
-
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -62,7 +66,10 @@ const Header = () => {
               className="rounded-md"
             />
 
-            <span className="flex items-baseline text-[22px] tracking-tight" style={{ fontFamily: 'Roboto, Arial, sans-serif' }}>
+            <span
+              className="flex items-baseline text-[22px] tracking-tight"
+              style={{ fontFamily: "Roboto, Arial, sans-serif" }}
+            >
               <span style={{ fontWeight: 700 }}>YourTube</span>
             </span>
 
@@ -117,7 +124,9 @@ const Header = () => {
                 <Button variant="ghost" className="rounded-full p-0">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user.image} />
-                    <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
+                    <AvatarFallback>
+                      {user.name?.[0] || "U"}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -152,7 +161,9 @@ const Header = () => {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
+                  Sign out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
